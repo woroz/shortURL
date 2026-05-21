@@ -8,7 +8,6 @@ import cookieParser from 'cookie-parser'
 import { getUrls, initDB } from './database/bd'
 
 const app = express()
-const PORT = process.env.PORT || 3000
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -22,8 +21,11 @@ app.get('/', async (req, res) => {
   res.render('example', { title: 'Short URL', shortUrl: null, urls, message: '' })
 })
 
-initDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`)
-  })
-}).catch(console.error)
+initDB().catch(console.error)
+
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3000
+  app.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`))
+}
+
+export default app
