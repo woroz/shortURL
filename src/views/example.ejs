@@ -32,7 +32,7 @@
 
         nav {
             border-bottom: 1px solid var(--border);
-            padding: 1.1rem 2rem;
+            padding: 1.4rem 2.5rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -46,7 +46,7 @@
         .nav-logo {
             font-family: 'DM Sans', sans-serif;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             letter-spacing: -0.02em;
             color: var(--text);
             text-decoration: none;
@@ -57,15 +57,30 @@
             color: var(--green);
         }
 
-        .nav-tag {
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
             font-family: 'DM Mono', monospace;
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             color: var(--muted);
-            background: var(--tag-bg);
-            border: 1px solid var(--border2);
-            padding: 0.25rem 0.6rem;
+            text-decoration: none;
+            padding: 0.35rem 0.8rem;
             border-radius: 100px;
-            letter-spacing: 0.05em;
+            border: 1px solid var(--border2);
+            background: var(--tag-bg);
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .nav-link:hover { color: var(--text); border-color: var(--text); }
+
+        .nav-link.active {
+            color: var(--text);
+            border-color: var(--text);
+            background: var(--card);
         }
 
         /* HERO */
@@ -104,23 +119,18 @@
             color: var(--text);
         }
 
-        .hero h1 strong {
-            font-weight: 700;
-        }
+        .hero h1 strong { font-weight: 700; }
 
         /* FORM */
         .form-card {
             background: var(--card);
-            border: 1px solid var(--border);
             border-radius: 20px;
             padding: 1.75rem;
             margin-bottom: 1rem;
             box-shadow: 0 2px 12px rgba(0,0,0,0.04);
         }
 
-        .field {
-            margin-bottom: 1rem;
-        }
+        .field { margin-bottom: 1rem; }
 
         .field label {
             font-family: 'DM Mono', monospace;
@@ -150,9 +160,7 @@
             box-shadow: 0 0 0 3px rgba(26,26,26,0.06);
         }
 
-        input[type="text"]::placeholder {
-            color: #c0bbb2;
-        }
+        input[type="text"]::placeholder { color: #c0bbb2; }
 
         .alias-wrap {
             display: flex;
@@ -186,9 +194,7 @@
             padding-left: 0.25rem;
         }
 
-        .alias-wrap input:focus {
-            box-shadow: none;
-        }
+        .alias-wrap input:focus { box-shadow: none; }
 
         .divider {
             height: 1px;
@@ -258,7 +264,6 @@
 
         .url-card {
             background: var(--card);
-            border: 1px solid var(--border);
             border-radius: 16px;
             display: flex;
             overflow: hidden;
@@ -273,14 +278,17 @@
         .url-img {
             width: 90px;
             min-width: 90px;
-            background: var(--tag-bg);
+            background: var(--card);
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .url-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
         }
 
         .url-img-placeholder {
@@ -300,6 +308,7 @@
             flex-direction: column;
             gap: 0.3rem;
             min-width: 0;
+            border-left: 1px solid var(--border);
         }
 
         .url-title {
@@ -354,12 +363,12 @@
             padding: 0.2rem 0.5rem;
             cursor: pointer;
             transition: color 0.15s, border-color 0.15s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
         }
 
-        .copy-btn:hover {
-            color: var(--text);
-            border-color: var(--text);
-        }
+        .copy-btn:hover { color: var(--text); border-color: var(--text); }
 
         .original-link {
             display: block;
@@ -391,7 +400,10 @@
 
     <nav>
         <a href="/" class="nav-logo">worito<em>.tech</em></a>
-        <span class="nav-tag">acortador de URLs</span>
+        <div class="nav-links">
+            <a href="/stats" class="nav-link">estadísticas</a>
+            <span class="nav-link active">acortador de URLs</span>
+        </div>
     </nav>
 
     <div class="hero">
@@ -433,9 +445,9 @@
                 <% urls.forEach(function(url) { %>
                     <div class="url-card">
                         <div class="url-img">
-                            <% if (url.imagen) { %>
-                                <img src="<%= url.imagen %>" alt="">
-                            <% } else { %>
+                            <% try { const domain = new URL(url.longUrl).hostname %>
+                                <img src="https://www.google.com/s2/favicons?domain=<%= domain %>&sz=128" alt="">
+                            <% } catch(e) { %>
                                 <div class="url-img-placeholder">↗</div>
                             <% } %>
                         </div>
@@ -449,6 +461,7 @@
                             <div class="url-meta">
                                 <a href="/<%= url.shortUrl %>" target="_blank" class="short-link">worito.tech/<%= url.shortUrl %></a>
                                 <button class="copy-btn" onclick="navigator.clipboard.writeText('https://worito.tech/<%= url.shortUrl %>');this.textContent='copiado';setTimeout(()=>this.textContent='copiar',1800)">copiar</button>
+                                <a href="/stats/<%= url.shortUrl %>" class="copy-btn">ver stats</a>
                             </div>
                             <a href="<%= url.longUrl %>" target="_blank" rel="noopener noreferrer" class="original-link"><%= url.longUrl %></a>
                         </div>
