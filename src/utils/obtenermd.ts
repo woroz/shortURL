@@ -9,7 +9,6 @@ export interface Metadatos {
 }
 
 export async function obtenerMetaDatos(url: string): Promise<Metadatos | undefined> {
-    console.log('url en obtenerMetaDatos:', url)
     if (!url) {
         console.log(`La URL proporcionada no es válida: ${url}`)
         return undefined
@@ -39,7 +38,6 @@ export async function obtenerMetaDatos(url: string): Promise<Metadatos | undefin
             return undefined
         }
     }
-    console.log('Contenido recibido de la URL:', data)
     const metaDatos: Metadatos = {
         titulo: $('meta[property="og:title"]').attr('content') ||
             $('title').text() ||

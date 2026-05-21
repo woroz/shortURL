@@ -1,28 +1,5 @@
-# dependencias de Node.js
 node_modules/
-build/
-# directorios de construcción
 dist/
-build/
-
-# archivos de entorno
 .env
-
-# archivos de bases de datos
-*.db
-
-# archivos de logs
-logs/
-*.log
-
-# achivos de configuración específicos del entorno
 nodemon.json
 
-# archivos de configuración del editor/IDE
-.vscode/
-.idea/
-
-# otros archivos generados
-coverage/
-.DS_Store
-.vercel

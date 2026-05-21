@@ -10,9 +10,7 @@ export function convert(url: string): string {
     }
 
    if (url.includes("x.com")) {
-    console.log('paso la prueba')
     const urlNueva = url.replace("x.com", "fxtwitter.com")
-    console.log('url convertida en convert:', urlNueva)
     return urlNueva
    }
    return url

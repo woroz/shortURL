@@ -1,103 +1,53 @@
-//la bd en si
-import connect from './database'
+import db from './database'
 
-export async function createUrls (idUsuario: string,shortUrl: string, longUrl: string, titulo?: string, descripcion?: string, imagen?: string) {
-const db = await connect()
-    if (db !== null) {
-        const urlTable = `
-            CREATE TABLE IF NOT EXISTS urls (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                IdUsuario TEXT NOT NULL,
-                shortUrl TEXT NOT NULL,
-                longUrl TEXT NOT NULL,
-                titulo TEXT,
-                descripcion TEXT,
-                imagen TEXT
-            )
-        `
-        const checkShortUrl = `SELECT * FROM urls WHERE shortUrl = ?`;
-        const insertUrl = `
-        INSERT INTO urls (IdUsuario, shortUrl, longUrl, titulo, descripcion, imagen)
-        VALUES (?, ?, ?, ?, ?, ?)
-        `
-        try {
-            await db.exec(urlTable)
-            const existingUrl = await db.get(checkShortUrl, [shortUrl]);
-            if (existingUrl) {
-                console.log("La URL ya existe:", existingUrl.shortUrl)
-                throw new Error("El shortUrl ya está en uso, elige otro.");
-            }
-            const result = await db.run(insertUrl, [idUsuario, shortUrl, longUrl, titulo, descripcion, imagen])
-            console.log("URL creada con exito")
-            return {
-                id: result.lastID,
-                idUsuario,
-                shortUrl,
-                longUrl,
-                titulo,
-                descripcion,
-                imagen
-            }
-        } catch (error) {
-            console.log("Error al crear la URL:", error)
-        }
-    }
+const urlTable = `
+  CREATE TABLE IF NOT EXISTS urls (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    IdUsuario TEXT NOT NULL,
+    shortUrl TEXT NOT NULL,
+    longUrl TEXT NOT NULL,
+    titulo TEXT,
+    descripcion TEXT,
+    imagen TEXT
+  )
+`
+
+export async function initDB() {
+  await db.execute(urlTable)
+  console.log('DB inicializada')
 }
 
-export async function getLongUrl(shortUrl: string) {
-    const db = await connect();
-    if (db !== null) {
-        const selectUrl = `
-            SELECT longUrl FROM urls
-            WHERE shortUrl = ?
-        `;
-        try {
-            const result = await db.get(selectUrl, [shortUrl]);
-            // Verificamos si result es null, lo que indica que no se encontró la URL
-            if (result) {
-                return result.longUrl; // Devolvemos la URL larga
-            } else {
-                console.log("URL no encontrada.");
-                return null; // O algún valor indicativo
-            }
-        } catch (error) {
-            console.log("Error al obtener la URL:", error);
-            return null; // En caso de error, devolvemos null
-        }
-    } else {
-        console.log("Error: no se pudo conectar a la base de datos.");
-        return null;
-    }
+export async function createUrls(idUsuario: string, shortUrl: string, longUrl: string, titulo?: string, descripcion?: string, imagen?: string) {
+  const existing = await db.execute({
+    sql: `SELECT * FROM urls WHERE shortUrl = ?`,
+    args: [shortUrl]
+  })
+  if (existing.rows.length > 0) throw new Error('El shortUrl ya está en uso, elige otro.')
+
+  const result = await db.execute({
+    sql: `INSERT INTO urls (IdUsuario, shortUrl, longUrl, titulo, descripcion, imagen) VALUES (?, ?, ?, ?, ?, ?)`,
+    args: [idUsuario, shortUrl, longUrl, titulo ?? null, descripcion ?? null, imagen ?? null]
+  })
+  return { id: result.lastInsertRowid, idUsuario, shortUrl, longUrl, titulo, descripcion, imagen }
 }
 
-//modificarla para que seleccione solo las url por Id de usuario
-export async function getUrls (IdUsuario: string) {
-    const db = await connect()
-    if (db !== null) {
-        const selectUrls = `
-            SELECT * FROM urls
-            WHERE IdUsuario = ?`
-            try {
-                const result = await db.all(selectUrls, [IdUsuario])
-                return result
-            } catch (error) {
-                
-            }
-    }
+export async function getLongUrl(shortUrl: string): Promise<string | null> {
+  const result = await db.execute({
+    sql: `SELECT longUrl FROM urls WHERE shortUrl = ?`,
+    args: [shortUrl]
+  })
+  return (result.rows[0]?.longUrl as string) ?? null
 }
 
-export async function borrarbd () {
-    const db = await connect()
-    if (db !== null) {
-        const borrarTabla = `
-            DROP TABLE IF EXISTS urls
-        `
-        try {
-            await db.exec(borrarTabla)
-            console.log("Tabla borrada con exito")
-        } catch (error) {
-            console.log("Error al borrar la tabla:", error)
-        }
-    }
+export async function getUrls(IdUsuario: string) {
+  const result = await db.execute({
+    sql: `SELECT * FROM urls WHERE IdUsuario = ?`,
+    args: [IdUsuario]
+  })
+  return result.rows
 }
 
+export async function borrarbd() {
+  await db.execute(`DROP TABLE IF EXISTS urls`)
+  console.log('Tabla borrada con éxito')
+}

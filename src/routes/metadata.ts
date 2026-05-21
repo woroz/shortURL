@@ -12,7 +12,6 @@ router.route('/metadata')
 
     try {
         const urlConvertida = convert(url)
-        console.log('url en metadata.ts', urlConvertida)
         const metadatos = await obtenerMetaDatos(urlConvertida)
 
         if (!metadatos) {

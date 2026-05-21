@@ -1,26 +1,36 @@
 import { Router, Request, Response } from 'express';
-import { createUrls, getLongUrl, getUrls, borrarbd } from '../database/bd';
+import { createUrls, getLongUrl, getUrls } from '../database/bd';
 import { validarURL } from '../utils/validation';
 import { createShortUrL } from '../utils/shortener';
 import { obtenerMetaDatos } from '../utils/obtenermd'
 import { convert } from '../utils/convert';
 import { generarIdUnico } from '../utils/idUnico'
+
 const router = Router();
 
-// Ruta para mostrar el formulario y la URL acortada
+router.route('/mis-url')
+.get(async (req: Request, res: Response) => {
+    const idUsuario = req.cookies.userId
+    try {
+        const urls = await getUrls(idUsuario)
+        res.render('example', { title: 'Mis URLs', urls, message: '' })
+    } catch (error) {
+        res.status(500).send('Error al obtener las URLs')
+    }
+})
+
 router.route('/url')
 .get(async (req: Request, res: Response) => {
-    const url = await getUrls(req.cookies.userId)
-    res.render('example', { title: 'Short URL', shortUrl: null, urls: url, message:'' })
+    const urls = await getUrls(req.cookies.userId)
+    res.render('example', { title: 'Short URL', shortUrl: null, urls, message: '' })
 })
 .post(async (req: Request, res: Response) => {
     const { longUrl, customAlias } = req.body
-    console.log('URL recibida:', longUrl)
     let idUsuario = req.cookies.userId
-    
+
     if (!idUsuario) {
-        idUsuario = generarIdUnico();
-        res.cookie('userId', idUsuario,{
+        idUsuario = generarIdUnico()
+        res.cookie('userId', idUsuario, {
             maxAge: 1000 * 60 * 60 * 24 * 365,
             httpOnly: true,
             secure: false,
@@ -29,66 +39,40 @@ router.route('/url')
 
     try {
         if (!validarURL(longUrl)) {
-            console.log('Error en la URL proporcionada')
             return res.render('error', { errorMessage: 'La URL proporcionada no es válida.' })
         }
+
         const urlConvertida = convert(longUrl)
         const shortUrl = createShortUrL(longUrl, customAlias)
         const existingUrl = await getLongUrl(shortUrl)
 
         if (existingUrl) {
-            console.log('La URL ya existe:', existingUrl.shortUrl)
-            return res.render('error', {errorMessage: 'El shortUrl ya está en uso, elige otro.'})
+            return res.render('error', { errorMessage: 'El shortUrl ya está en uso, elige otro.' })
         }
 
-        console.log('URL corta generada:', shortUrl)
-        console.log('URL convertida:', urlConvertida)
         const metaDatos = await obtenerMetaDatos(urlConvertida)
-        // Guarda el shortUrl y la longUrl en la base de datos
         await createUrls(idUsuario, shortUrl, urlConvertida, metaDatos?.titulo, metaDatos?.descripcion, metaDatos?.imagen)
         const urls = await getUrls(idUsuario)
-        // Renderiza la página con la URL acortada
         res.render('example', { title: 'Short URL', shortUrl, urls, message: '' })
     } catch (error) {
-        console.error('Error al procesar el registro:', error)
         res.status(500).send('Error interno del servidor')
     }
 })
 
-// Ruta dinámica para redirigir usando la URL acortada
 router.route('/:shortUrl')
 .get(async (req: Request, res: Response) => {
-    const shortUrl = req.params.shortUrl
+    const { shortUrl } = req.params
     try {
-        console.log('URL corta recibida desde shortUrl:', shortUrl)
-        if (typeof shortUrl !== 'string') {
-            res.status(400).send('URL no válida')
-            return res.render('error', {errorMessage: 'El formato de la URL no es valida.'})
-        }
-        const urlOriginal = await getLongUrl(shortUrl)  // Recupera la URL original desde la base de datos
+        const urlOriginal = await getLongUrl(shortUrl)
 
         if (!urlOriginal) {
             res.status(404).send('URL no encontrada')
             return
         }
 
-        // Redirige al usuario a la URL original
         res.redirect(urlOriginal)
     } catch (error) {
-        console.error('Error al recuperar la URL:', error)
         res.status(500).send('Error interno del servidor')
-    }
-})
-
-router.route('/mis-url')
-.get(async (req: Request, res: Response) => {
-    const idUsuario = req.cookies.userId
-    try {
-        const urls = await getUrls(idUsuario)
-        res.render('example', { title: 'Mis URLs', urls, message:'' })
-    } catch (error) {
-        console.error('Error al obtener las URLs:', error)
-        res.status(500).send('Error al obtener las URLs')
     }
 })
 
