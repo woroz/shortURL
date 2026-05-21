@@ -17,7 +17,7 @@ app.set('views', path.join(__dirname, '../src/views'))
 app.set('view engine', 'ejs')
 
 app.get('/', async (req, res) => {
-  const urls = await getUrls(req.cookies.userId)
+  const urls = req.cookies.userId ? await getUrls(req.cookies.userId) : []
   res.render('example', { title: 'Short URL', shortUrl: null, urls, message: '' })
 })
 

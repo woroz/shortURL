@@ -40,6 +40,7 @@ export async function getLongUrl(shortUrl: string): Promise<string | null> {
 }
 
 export async function getUrls(IdUsuario: string) {
+  if (!IdUsuario) return [] 
   const result = await db.execute({
     sql: `SELECT * FROM urls WHERE IdUsuario = ?`,
     args: [IdUsuario]
