@@ -4,229 +4,307 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --bg: #0a0a0a;
-            --surface: #111111;
-            --surface2: #1a1a1a;
-            --border: #2a2a2a;
-            --accent: #b5ff4d;
-            --accent2: #4dffb5;
-            --text: #f0f0f0;
-            --muted: #666;
-            --danger: #ff4d4d;
+            --bg: #f7f5f0;
+            --card: #ffffff;
+            --border: #e8e4dc;
+            --border2: #d4cfc4;
+            --accent: #1a1a1a;
+            --green: #2d6a2d;
+            --green-bg: #eef5ee;
+            --green-light: #c8e6c8;
+            --text: #1a1a1a;
+            --muted: #8a8478;
+            --tag-bg: #f0ede6;
         }
 
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'Syne', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             min-height: 100vh;
+            padding: 0;
+        }
+
+        nav {
+            border-bottom: 1px solid var(--border);
+            padding: 1.1rem 2rem;
             display: flex;
-            justify-content: center;
-            padding: 3rem 1rem;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(247,245,240,0.85);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .container {
-            width: 100%;
-            max-width: 680px;
+        .nav-logo {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            text-decoration: none;
         }
 
-        /* HEADER */
-        .header {
-            margin-bottom: 3rem;
-            display: flex;
-            align-items: baseline;
-            gap: 1rem;
+        .nav-logo em {
+            font-style: normal;
+            color: var(--green);
         }
 
-        .logo {
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            line-height: 1;
+        .nav-tag {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--muted);
+            background: var(--tag-bg);
+            border: 1px solid var(--border2);
+            padding: 0.25rem 0.6rem;
+            border-radius: 100px;
+            letter-spacing: 0.05em;
         }
 
-        .logo span {
-            color: var(--accent);
+        /* HERO */
+        .hero {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem 2rem;
         }
 
-        .tagline {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.7rem;
+        .hero-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
             color: var(--muted);
             letter-spacing: 0.1em;
             text-transform: uppercase;
-        }
-
-        /* FORM CARD */
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .input-group {
+            margin-bottom: 1rem;
             display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hero-label::before {
+            content: '';
+            display: block;
+            width: 18px;
+            height: 1px;
+            background: var(--muted);
+        }
+
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 300;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 2.5rem;
+            color: var(--text);
+        }
+
+        .hero h1 strong {
+            font-weight: 700;
+        }
+
+        /* FORM */
+        .form-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.75rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+
+        .field {
             margin-bottom: 1rem;
         }
 
-        .input-wrap {
-            position: relative;
-        }
-
-        .input-wrap label {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
+        .field label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
             color: var(--muted);
             text-transform: uppercase;
             letter-spacing: 0.1em;
             display: block;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.5rem;
         }
 
         input[type="text"] {
             width: 100%;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            background: var(--bg);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
             color: var(--text);
-            font-family: 'Space Mono', monospace;
+            font-family: 'DM Mono', monospace;
             font-size: 0.85rem;
             padding: 0.85rem 1rem;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
 
         input[type="text"]:focus {
-            border-color: var(--accent);
+            border-color: var(--text);
+            box-shadow: 0 0 0 3px rgba(26,26,26,0.06);
         }
 
         input[type="text"]::placeholder {
-            color: var(--muted);
+            color: #c0bbb2;
         }
 
-        .alias-row {
+        .alias-wrap {
             display: flex;
             align-items: center;
-            gap: 0;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            background: var(--bg);
+            border: 1px solid var(--border2);
+            border-radius: 12px;
             overflow: hidden;
-            transition: border-color 0.2s;
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
 
-        .alias-row:focus-within {
-            border-color: var(--accent);
+        .alias-wrap:focus-within {
+            border-color: var(--text);
+            box-shadow: 0 0 0 3px rgba(26,26,26,0.06);
         }
 
         .alias-prefix {
-            font-family: 'Space Mono', monospace;
+            font-family: 'DM Mono', monospace;
             font-size: 0.8rem;
-            color: var(--accent);
-            padding: 0.85rem 0.75rem 0.85rem 1rem;
+            color: var(--green);
+            padding: 0.85rem 0.5rem 0.85rem 1rem;
             white-space: nowrap;
-            border-right: 1px solid var(--border);
-            background: #1f1f1f;
+            user-select: none;
         }
 
-        .alias-row input {
+        .alias-wrap input {
             border: none;
             border-radius: 0;
             background: transparent;
-            flex: 1;
+            box-shadow: none;
+            padding-left: 0.25rem;
+        }
+
+        .alias-wrap input:focus {
+            box-shadow: none;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.25rem 0;
         }
 
         .btn {
             width: 100%;
-            padding: 1rem;
-            background: var(--accent);
-            color: #0a0a0a;
+            padding: 0.9rem 1rem;
+            background: var(--text);
+            color: #f7f5f0;
             border: none;
-            border-radius: 10px;
-            font-family: 'Syne', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
             cursor: pointer;
-            letter-spacing: 0.02em;
+            letter-spacing: -0.01em;
             transition: opacity 0.15s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
         }
 
-        .btn:hover { opacity: 0.88; }
+        .btn:hover { opacity: 0.82; }
         .btn:active { transform: scale(0.99); }
 
-        /* URLS LIST */
-        .section-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
+        /* URLS */
+        .urls-section {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
             color: var(--muted);
             text-transform: uppercase;
-            letter-spacing: 0.12em;
-            margin-bottom: 1rem;
+            letter-spacing: 0.1em;
+        }
+
+        .count-badge {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            background: var(--tag-bg);
+            border: 1px solid var(--border2);
+            color: var(--muted);
+            padding: 0.15rem 0.5rem;
+            border-radius: 100px;
         }
 
         .url-list {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
-        .url-item {
-            background: var(--surface);
+        .url-card {
+            background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
+            border-radius: 16px;
             display: flex;
-            transition: border-color 0.2s;
+            overflow: hidden;
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
 
-        .url-item:hover {
-            border-color: #3a3a3a;
+        .url-card:hover {
+            border-color: var(--border2);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
         }
 
-        .url-thumb {
-            width: 100px;
-            min-width: 100px;
-            background: var(--surface2);
+        .url-img {
+            width: 90px;
+            min-width: 90px;
+            background: var(--tag-bg);
             overflow: hidden;
         }
 
-        .url-thumb img {
+        .url-img img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .url-thumb-placeholder {
+        .url-img-placeholder {
             width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            color: var(--border);
+            font-size: 1.4rem;
+            color: var(--border2);
         }
 
-        .url-body {
-            padding: 1rem 1.2rem;
+        .url-content {
+            padding: 1rem 1.1rem;
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
+            gap: 0.3rem;
             min-width: 0;
         }
 
         .url-title {
-            font-size: 0.95rem;
-            font-weight: 600;
+            font-size: 0.88rem;
+            font-weight: 500;
             color: var(--text);
             white-space: nowrap;
             overflow: hidden;
@@ -234,8 +312,9 @@
         }
 
         .url-desc {
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             color: var(--muted);
+            font-weight: 300;
             line-height: 1.5;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -243,137 +322,145 @@
             overflow: hidden;
         }
 
-        .url-links {
-            margin-top: 0.4rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .url-short {
+        .url-meta {
+            margin-top: 0.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
-        .url-short-badge {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.75rem;
-            background: #1a2a0a;
-            color: var(--accent);
-            border: 1px solid #2a3a1a;
-            border-radius: 6px;
-            padding: 0.2rem 0.6rem;
+        .short-link {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72rem;
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid var(--green-light);
+            border-radius: 8px;
+            padding: 0.2rem 0.55rem;
             text-decoration: none;
             transition: background 0.15s;
         }
 
-        .url-short-badge:hover {
-            background: #223510;
-        }
+        .short-link:hover { background: var(--green-light); }
 
         .copy-btn {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
             background: none;
-            border: none;
+            border: 1px solid var(--border2);
             color: var(--muted);
+            border-radius: 6px;
+            padding: 0.2rem 0.5rem;
             cursor: pointer;
-            font-size: 0.8rem;
-            padding: 0.1rem 0.3rem;
-            border-radius: 4px;
-            transition: color 0.15s;
-            font-family: 'Space Mono', monospace;
+            transition: color 0.15s, border-color 0.15s;
         }
 
-        .copy-btn:hover { color: var(--accent); }
+        .copy-btn:hover {
+            color: var(--text);
+            border-color: var(--text);
+        }
 
-        .url-original {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.68rem;
+        .original-link {
+            display: block;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
             color: var(--muted);
+            text-decoration: none;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            text-decoration: none;
+            margin-top: 0.15rem;
         }
 
-        .url-original:hover { color: var(--accent2); }
+        .original-link:hover { color: var(--text); }
 
-        .empty {
+        .empty-state {
             text-align: center;
             padding: 3rem 1rem;
             color: var(--muted);
-            font-family: 'Space Mono', monospace;
-            font-size: 0.8rem;
         }
 
-        .empty-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .empty-state p {
+            font-size: 0.82rem;
+            font-weight: 300;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div>
-                <div class="logo">worito<span>.tech</span></div>
-                <div class="tagline">acortador de URLs</div>
-            </div>
-        </div>
 
-        <div class="card">
+    <nav>
+        <a href="/" class="nav-logo">worito<em>.tech</em></a>
+        <span class="nav-tag">acortador de URLs</span>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-label">acortar enlace</div>
+        <h1>URLs <strong>cortas</strong>,<br>links que duran.</h1>
+
+        <div class="form-card">
             <form action="/url" method="POST">
-                <div class="input-group">
-                    <div class="input-wrap">
-                        <label>URL larga</label>
-                        <input type="text" name="longUrl" placeholder="https://ejemplo.com/url-muy-larga..." required>
-                    </div>
-                    <div class="input-wrap">
-                        <label>Alias personalizado (opcional)</label>
-                        <div class="alias-row">
-                            <span class="alias-prefix">worito.tech/</span>
-                            <input type="text" name="customAlias" placeholder="mi-alias">
-                        </div>
+                <div class="field">
+                    <label>URL larga</label>
+                    <input type="text" name="longUrl" placeholder="https://ejemplo.com/una-url-muy-larga" required>
+                </div>
+                <div class="field">
+                    <label>Alias personalizado — opcional</label>
+                    <div class="alias-wrap">
+                        <span class="alias-prefix">worito.tech/</span>
+                        <input type="text" name="customAlias" placeholder="mi-alias">
                     </div>
                 </div>
-                <button type="submit" class="btn">Acortar URL →</button>
+                <div class="divider"></div>
+                <button type="submit" class="btn">
+                    Acortar enlace
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
             </form>
         </div>
+    </div>
 
-        <div class="section-label">Mis URLs</div>
+    <div class="urls-section">
+        <div class="section-header">
+            <span class="section-title">Mis enlaces</span>
+            <% if (urls && urls.length > 0) { %>
+                <span class="count-badge"><%= urls.length %></span>
+            <% } %>
+        </div>
 
         <div class="url-list">
             <% if (urls && urls.length > 0) { %>
                 <% urls.forEach(function(url) { %>
-                    <div class="url-item">
-                        <div class="url-thumb">
+                    <div class="url-card">
+                        <div class="url-img">
                             <% if (url.imagen) { %>
                                 <img src="<%= url.imagen %>" alt="">
                             <% } else { %>
-                                <div class="url-thumb-placeholder">🔗</div>
+                                <div class="url-img-placeholder">↗</div>
                             <% } %>
                         </div>
-                        <div class="url-body">
+                        <div class="url-content">
                             <% if (url.titulo) { %>
                                 <div class="url-title"><%= url.titulo %></div>
                             <% } %>
                             <% if (url.descripcion) { %>
                                 <div class="url-desc"><%= url.descripcion %></div>
                             <% } %>
-                            <div class="url-links">
-                                <div class="url-short">
-                                    <a href="/<%= url.shortUrl %>" target="_blank" class="url-short-badge">worito.tech/<%= url.shortUrl %></a>
-                                    <button class="copy-btn" onclick="navigator.clipboard.writeText('https://worito.tech/<%= url.shortUrl %>');this.textContent='✓';setTimeout(()=>this.textContent='copy',1500)">copy</button>
-                                </div>
-                                <a href="<%= url.longUrl %>" target="_blank" rel="noopener noreferrer" class="url-original"><%= url.longUrl %></a>
+                            <div class="url-meta">
+                                <a href="/<%= url.shortUrl %>" target="_blank" class="short-link">worito.tech/<%= url.shortUrl %></a>
+                                <button class="copy-btn" onclick="navigator.clipboard.writeText('https://worito.tech/<%= url.shortUrl %>');this.textContent='copiado';setTimeout(()=>this.textContent='copiar',1800)">copiar</button>
                             </div>
+                            <a href="<%= url.longUrl %>" target="_blank" rel="noopener noreferrer" class="original-link"><%= url.longUrl %></a>
                         </div>
                     </div>
                 <% }); %>
             <% } else { %>
-                <div class="empty">
-                    <div class="empty-icon">🔗</div>
-                    No hay URLs acortadas todavía.
+                <div class="empty-state">
+                    <p>Todavia no acortaste ningun enlace.</p>
                 </div>
             <% } %>
         </div>
     </div>
+
 </body>
 </html>
