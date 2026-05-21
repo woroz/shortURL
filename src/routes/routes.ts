@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { createUrls, getLongUrl, getUrls } from '../database/bd';
+import { createUrls, getLongUrl, getUrls, incrementarClicks, getUrlByShort } from '../database/bd';
 import { validarURL } from '../utils/validation';
 import { createShortUrL } from '../utils/shortener';
 import { obtenerMetaDatos } from '../utils/obtenermd'
@@ -8,8 +8,43 @@ import { generarIdUnico } from '../utils/idUnico'
 
 const router = Router();
 
-router.route('/mis-url')
-.get(async (req: Request, res: Response) => {
+router.route('/stats').get(async (req: Request, res: Response) => {
+    const idUsuario = req.cookies.userId
+    if (!idUsuario) {
+        res.redirect('/')
+        return
+    }
+    
+    try {
+        const urls = await getUrls(idUsuario)
+        const totalClicks = urls.reduce((sum, url) => sum + (Number(url.clicks) || 0), 0)
+        res.render('stats', { urls, totalClicks })
+    } catch (error) {
+        res.status(500).send('Error al obtener las estadisticas')
+    }
+})
+
+router.route('/stats/:shortUrl').get(async (req: Request, res: Response) => {
+    const { shortUrl } = req.params
+    const idUsuario = req.cookies.userId
+    if (!idUsuario)  {
+        res.redirect('/') 
+        return
+    }
+    try {
+        const url = await getUrlByShort(shortUrl)
+        if (!url){
+            res.status(404).send('No encontrada')
+            return
+        }
+        res.render('stats-detail', { url })
+    } catch {
+        res.status(500).send('Error al obtener las estadisticas')
+    }
+
+})
+
+router.route('/mis-url').get(async (req: Request, res: Response) => {
     const idUsuario = req.cookies.userId
     try {
         const urls = await getUrls(idUsuario)
@@ -19,12 +54,12 @@ router.route('/mis-url')
     }
 })
 
-router.route('/url')
-.get(async (req: Request, res: Response) => {
+router.route('/url').get(async (req: Request, res: Response) => {
     const urls = await getUrls(req.cookies.userId)
     res.render('example', { title: 'Short URL', shortUrl: null, urls, message: '' })
 })
-.post(async (req: Request, res: Response) => {
+
+router.route('/url').post(async (req: Request, res: Response) => {
     const { longUrl, customAlias } = req.body
     let idUsuario = req.cookies.userId
 
@@ -43,7 +78,7 @@ router.route('/url')
         }
 
         const urlConvertida = convert(longUrl)
-        const shortUrl = createShortUrL(longUrl, customAlias)
+        const shortUrl = createShortUrL(longUrl, customAlias, idUsuario)
         const existingUrl = await getLongUrl(shortUrl)
 
         if (existingUrl) {
@@ -59,8 +94,8 @@ router.route('/url')
     }
 })
 
-router.route('/:shortUrl')
-.get(async (req: Request, res: Response) => {
+
+router.route('/:shortUrl').get(async (req: Request, res: Response) => {
     const { shortUrl } = req.params
     try {
         const urlOriginal = await getLongUrl(shortUrl)
@@ -69,7 +104,7 @@ router.route('/:shortUrl')
             res.status(404).send('URL no encontrada')
             return
         }
-
+        await incrementarClicks(shortUrl)
         res.redirect(urlOriginal)
     } catch (error) {
         res.status(500).send('Error interno del servidor')

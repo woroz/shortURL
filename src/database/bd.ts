@@ -14,13 +14,18 @@ const urlTable = `
 
 export async function initDB() {
   await db.execute(urlTable)
+  try {
+    await db.execute(`ALTER TABLE urls ADD COLUMN clicks INTEGER DEFAULT 0`)
+  } catch (e) {
+  }
+
   console.log('DB inicializada')
 }
 
 export async function createUrls(idUsuario: string, shortUrl: string, longUrl: string, titulo?: string, descripcion?: string, imagen?: string) {
   const existing = await db.execute({
-    sql: `SELECT * FROM urls WHERE shortUrl = ?`,
-    args: [shortUrl]
+    sql: `SELECT * FROM urls WHERE shortUrl = ? AND IdUsuario = ?`,
+    args: [shortUrl, idUsuario]
   })
   if (existing.rows.length > 0) throw new Error('El shortUrl ya está en uso, elige otro.')
 
@@ -51,4 +56,19 @@ export async function getUrls(IdUsuario: string) {
 export async function borrarbd() {
   await db.execute(`DROP TABLE IF EXISTS urls`)
   console.log('Tabla borrada con éxito')
+}
+
+export async function incrementarClicks(shortUrl: string) {
+  await db.execute({
+    sql: `UPDATE urls SET clicks = clicks + 1 WHERE shortUrl = ?`,
+    args: [shortUrl]
+  })
+}
+
+export async function getUrlByShort(shortUrl: string) {
+  const result = await db.execute({
+    sql: `SELECT * FROM urls WHERE shortUrl = ?`,
+    args: [shortUrl]
+  })
+  return result.rows[0] ?? null
 }

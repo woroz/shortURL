@@ -6,12 +6,8 @@ export function convert(url: string): string {
     }
 
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;  // Añadir https por defecto si no tiene protocolo
+        url = 'https://' + url;
     }
-
-   if (url.includes("x.com")) {
-    const urlNueva = url.replace("x.com", "fxtwitter.com")
-    return urlNueva
-   }
+    
    return url
 }
