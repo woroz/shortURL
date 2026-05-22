@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { createUrls, getLongUrl, getUrls, incrementarClicks, getUrlByShort } from '../database/bd';
+import { createUrls, getLongUrl, getUrls, incrementarClicks, getUrlByShort, deleteUrl, updateAlias} from '../database/bd';
 import { validarURL } from '../utils/validation';
 import { createShortUrL } from '../utils/shortener';
 import { obtenerMetaDatos } from '../utils/obtenermd'
@@ -74,7 +74,8 @@ router.route('/url').post(async (req: Request, res: Response) => {
 
     try {
         if (!validarURL(longUrl)) {
-            return res.render('error', { errorMessage: 'La URL proporcionada no es válida.' })
+            res.status(400).json({ error: 'La URL proporcionada no es válida.' })
+            return
         }
 
         const urlConvertida = convert(longUrl)
@@ -82,18 +83,54 @@ router.route('/url').post(async (req: Request, res: Response) => {
         const existingUrl = await getLongUrl(shortUrl)
 
         if (existingUrl) {
-            return res.render('error', { errorMessage: 'El shortUrl ya está en uso, elige otro.' })
+            res.status(400).json({ error: 'El alias ya esta en uso, elege otro.' })
+            return
         }
 
         const metaDatos = await obtenerMetaDatos(urlConvertida)
         await createUrls(idUsuario, shortUrl, urlConvertida, metaDatos?.titulo, metaDatos?.descripcion, metaDatos?.imagen)
         const urls = await getUrls(idUsuario)
-        res.render('example', { title: 'Short URL', shortUrl, urls, message: '' })
+        res.json({
+            shortUrl,
+            longUrl: urlConvertida,
+            titulo: metaDatos?.titulo ?? null,
+            descripcion: metaDatos?.descripcion ?? null,
+            imagen: metaDatos?.imagen ?? null,
+        })
     } catch (error) {
-        res.status(500).send('Error interno del servidor')
+        console.log('Error en POST /url:', error)
+        res.status(500).json({ error: 'Error interno del servidor' })
     }
 })
 
+router.delete('/url/:shortUrl', async (req: Request, res: Response) => {
+  const idUsuario = req.cookies.userId
+  if (!idUsuario) {
+    res.status(401).json({ error: 'No autorizado' })
+    return
+  }
+  try {
+    await deleteUrl(req.params.shortUrl, idUsuario)
+    res.json({ ok: true })
+  } catch {
+    res.status(500).json({ error: 'Error al eliminar' })
+  }
+})
+
+router.patch('/url/:shortUrl', async (req: Request, res: Response) => {
+  const idUsuario = req.cookies.userId
+  const { newAlias } = req.body
+  if (!idUsuario) {
+    res.status(401).json({ error: 'No autorizado' })
+    return
+}
+  try {
+    await updateAlias(req.params.shortUrl, newAlias, idUsuario)
+    res.json({ ok: true, newAlias })
+  } catch (error: any) {
+    res.status(400).json({ error: error.message })
+  }
+})
 
 router.route('/:shortUrl').get(async (req: Request, res: Response) => {
     const { shortUrl } = req.params

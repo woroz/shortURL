@@ -27,7 +27,7 @@ export async function createUrls(idUsuario: string, shortUrl: string, longUrl: s
     sql: `SELECT * FROM urls WHERE shortUrl = ? AND IdUsuario = ?`,
     args: [shortUrl, idUsuario]
   })
-  if (existing.rows.length > 0) throw new Error('El shortUrl ya está en uso, elige otro.')
+  if (existing.rows.length > 0) throw new Error('Este alias ya esta en uso, elige otro.')
 
   const result = await db.execute({
     sql: `INSERT INTO urls (IdUsuario, shortUrl, longUrl, titulo, descripcion, imagen) VALUES (?, ?, ?, ?, ?, ?)`,
@@ -53,9 +53,24 @@ export async function getUrls(IdUsuario: string) {
   return result.rows
 }
 
-export async function borrarbd() {
-  await db.execute(`DROP TABLE IF EXISTS urls`)
-  console.log('Tabla borrada con éxito')
+export async function deleteUrl(shortUrl: string, IdUsuario: string) {
+  await db.execute({
+    sql: `DELETE FROM urls WHERE shortUrl = ? AND IdUsuario = ?`,
+    args: [shortUrl, IdUsuario]
+  })
+}
+
+export async function updateAlias(shortUrl: string, newAlias: string, IdUsuario: string) {
+  const existing = await db.execute({
+    sql: `SELECT * FROM urls WHERE shortUrl = ? AND IdUsuario = ?`,
+    args: [newAlias, IdUsuario]
+  })
+  if (existing.rows.length > 0) throw new Error('El alias ya esta en uso, elege otro.')
+  
+  await db.execute({
+    sql: `UPDATE urls SET shortUrl = ? WHERE shortUrl = ? AND IdUsuario = ?`,
+    args: [newAlias, shortUrl, IdUsuario]
+  })
 }
 
 export async function incrementarClicks(shortUrl: string) {
