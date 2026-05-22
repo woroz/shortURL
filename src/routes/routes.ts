@@ -103,7 +103,7 @@ router.route('/url').post(async (req: Request, res: Response) => {
     }
 })
 
-router.delete('/url/:shortUrl', async (req: Request, res: Response) => {
+router.route('/url/:shortUrl').delete(async (req: Request, res: Response) => {
   const idUsuario = req.cookies.userId
   if (!idUsuario) {
     res.status(401).json({ error: 'No autorizado' })
@@ -117,7 +117,7 @@ router.delete('/url/:shortUrl', async (req: Request, res: Response) => {
   }
 })
 
-router.patch('/url/:shortUrl', async (req: Request, res: Response) => {
+router.route('/url/:shortUrl').patch(async (req: Request, res: Response) => {
   const idUsuario = req.cookies.userId
   const { newAlias } = req.body
   if (!idUsuario) {
